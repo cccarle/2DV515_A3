@@ -23,7 +23,7 @@ const getAllPagesThatIncludeWord = (word, allPages) => {
   let pagesWithTheWord = []
 
   allPages.forEach(page => {
-    let score = 0
+    let score = 0.0
 
     page.words.forEach(wordInPage => {
       if (word == wordInPage) {

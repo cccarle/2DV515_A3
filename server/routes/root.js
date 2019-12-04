@@ -17,6 +17,8 @@ module.exports = server => {
         wordID: wordId,
         numberOfPages: pagesThatIncludeWord.length,
         pagesThatIncludeWord: pagesThatIncludeWord
+          .sort((a, b) => parseFloat(b.score) - parseFloat(a.score))
+          .slice(0, 5)
       })
       next()
     } catch (err) {
