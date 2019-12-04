@@ -19,4 +19,5 @@ server.use(cors.actual)
 server.listen(process.env.PORT || 4000, () => {
   console.log('Successfully stared at localhost:' + PORT)
   require('./routes/root')(server)
+  require('./routes/word')(server)
 })
