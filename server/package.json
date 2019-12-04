@@ -1,0 +1,17 @@
+{
+  "name": "2dv515_a3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "nodemon": "^2.0.1",
+    "restify": "^8.5.0",
+    "restify-cors-middleware": "^1.1.1",
+    "restify-errors": "^8.0.1"
+  }
+}
