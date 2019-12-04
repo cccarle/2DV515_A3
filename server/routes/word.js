@@ -9,7 +9,7 @@ module.exports = server => {
 
       res.json(200, {
         wordID: searchResult.wordId,
-        numberOfPages: searchResult.pagesThatIncludeWord.length,
+        numberOfPages: searchResult.numberOfResults,
         pagesThatIncludeWord: searchResult.pagesThatIncludeWord
       })
       next()

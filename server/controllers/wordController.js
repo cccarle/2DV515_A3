@@ -10,11 +10,13 @@ const getResultsForSearchedWord = async word => {
   const allPages = await getAllWordsIDsInPages()
 
   let wordId = getWordID(word)
+  let numberOfResults = await getAllPagesThatIncludeWord(wordId, allPages)
+    .length
   let pagesThatIncludeWord = await getAllPagesThatIncludeWord(wordId, allPages)
     .sort((a, b) => parseFloat(b.score) - parseFloat(a.score))
     .slice(0, 5)
 
-  return { pagesThatIncludeWord, wordId }
+  return { pagesThatIncludeWord, wordId, numberOfResults }
 }
 
 module.exports = {
