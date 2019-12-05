@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path_to_programming_words = './data/Words/Programming'
 const path_to_games_word = './data/Words/Games'
-const { getWordID } = require('./helpers')
+const { wordToID } = require('./helpers')
 
 /* 
 Read every link and for every word create word ID
@@ -14,7 +14,7 @@ const readFile = path => {
       .readFileSync(path + `/${link}`, 'utf-8')
       .replace(/[()]/g, '')
       .split(' ')
-      .map(word => getWordID(word))
+      .map(word => wordToID(word))
   }))
 }
 
@@ -31,5 +31,5 @@ const getAllWordsIDsInPages = async () => {
 
 module.exports = {
   getAllWordsIDsInPages,
-  getWordID
+  wordToID
 }

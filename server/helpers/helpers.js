@@ -1,15 +1,15 @@
 let id = 0
-let word = {}
+let index = {}
 
 /* 
 Creates unique ID for every word.
 */
 
-const getWordID = mapWord => {
-  if (word[mapWord]) {
-    return word[mapWord]
+const wordToID = word => {
+  if (index[word] != null) {
+    return index[word]
   } else {
-    word[mapWord] = id++
+    index[word] = ++id
     return id
   }
 }
@@ -65,5 +65,5 @@ const normalize = (pagesWithTheWord, max) => {
 
 module.exports = {
   getAllPagesThatIncludeWord,
-  getWordID
+  wordToID
 }

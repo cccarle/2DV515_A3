@@ -1,4 +1,4 @@
-const { getAllWordsIDsInPages, getWordID } = require('../helpers/readData')
+const { getAllWordsIDsInPages, wordToID } = require('../helpers/readData')
 const { getAllPagesThatIncludeWord } = require('../helpers/helpers')
 
 /* 
@@ -9,7 +9,7 @@ Returns in an ascending order and onlu top 5
 const getResultsForSearchedWord = async word => {
   const allPages = await getAllWordsIDsInPages()
 
-  let wordId = getWordID(word)
+  let wordId = wordToID(word)
   let numberOfResults = await getAllPagesThatIncludeWord(wordId, allPages)
     .length
   let pagesThatIncludeWord = await getAllPagesThatIncludeWord(wordId, allPages)
