@@ -32,8 +32,8 @@ export default function ResultTable() {
 
   const renderResult = () => {
     if (
-      globalState.searchResult.pagesThatIncludeWord != undefined &&
-      globalState.searchResult.pagesThatIncludeWord.length != 0
+      globalState.searchResult.countMatchingResults != undefined &&
+      globalState.searchResult.countMatchingResults != 0
     ) {
       return (
         <Paper className={classes.root}>
@@ -48,14 +48,14 @@ export default function ResultTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {globalState.searchResult.pagesThatIncludeWord.map(page => (
+              {globalState.searchResult.totalScores.map(page => (
                 <TableRow key={page.url}>
-                  <TableCell component="th" scope="row">
-                    {page.url.slice(19)}
+                  <TableCell href={'https:2d'} component="th" scope="row">
+                    <a href={`https://${page.url}`}> {page.url.slice(19)}</a>
                   </TableCell>
                   <TableCell align="right">{page.score}</TableCell>
-                  <TableCell align="right">0</TableCell>
-                  <TableCell align="right">0</TableCell>
+                  <TableCell align="right">{page.wsScore}</TableCell>
+                  <TableCell align="right">{page.doc}</TableCell>
                   <TableCell align="right">0</TableCell>
                 </TableRow>
               ))}
@@ -67,10 +67,10 @@ export default function ResultTable() {
   }
 
   const renderPageResults = () => {
-    if (globalState.searchResult.numberOfPages) {
+    if (globalState.searchResult.countMatchingResults) {
       return (
         <Typography variant="overline">
-          Found: {globalState.searchResult.numberOfPages} results
+          Found: {globalState.searchResult.countMatchingResults} results
         </Typography>
       )
     }
@@ -78,8 +78,8 @@ export default function ResultTable() {
 
   const ifNoResult = () => {
     if (
-      globalState.searchResult.pagesThatIncludeWord != undefined &&
-      globalState.searchResult.pagesThatIncludeWord.length == 0
+      globalState.searchResult.countMatchingResults != undefined &&
+      globalState.searchResult.countMatchingResults == 0
     ) {
       return (
         <Typography variant="overline">

@@ -15,8 +15,27 @@ const wordToID = word => {
 }
 
 /* 
-Returns all pages URL that contains the searched word. 
-And returns how many times the word occurs in the page
+Returns an array with objects for every page.
+*/
+
+const createObjectsOfEveryPage = (allPages, wordQuerys) => {
+  const results = []
+
+  allPages.map(page =>
+    results.push({
+      url: page.url,
+      totalScore: 0,
+      wsScore: getWordFrequencyScore(wordQuerys, page),
+      docScore: getDocumentLocation(wordQuerys, page)
+    })
+  )
+
+  return results
+}
+
+/* 
+Returns frequencyScore for a page and also keep an counter of how many time a word occurs.
+Iterate through the words queries.
 */
 
 const getWordFrequencyScore = (words, page) => {
@@ -33,22 +52,26 @@ const getWordFrequencyScore = (words, page) => {
   return wsScore
 }
 
+/* 
+Returns document location score for a page.
+Iterate through the words queries.
+*/
+
 const getDocumentLocation = (words, page) => {
   let docScore = 0
   words.forEach(word => {
-    let wordIndex = page.words.indexOf(word)
+    let wordIndex = page.words.indexOf(word) // find index
     if (wordIndex !== -1) {
       docScore += wordIndex + 1
     } else {
       docScore += 100000
     }
-    console.log(docScore)
   })
   return docScore
 }
 
 /* 
-Returns the max value of the scores.
+Returns the max value of the word frequency scores.
 */
 
 const getMaxValue = results => {
@@ -56,7 +79,7 @@ const getMaxValue = results => {
 }
 
 /* 
-Returns the min value of the scores.
+Returns the min value of the document location scores.
 */
 
 const getMinValue = results => {
@@ -64,10 +87,11 @@ const getMinValue = results => {
 }
 
 /* 
-Normalize the score for every pages score by dividing it by the max value of the scores.
+Normalize the word frequency scores for every pages.
+Dividing it by the max value & updating the wsScore of the array.
 */
 
-const normalize = results => {
+const normalizeWordFrequencyScore = results => {
   let max = getMaxValue(results)
 
   results.forEach(page => {
@@ -76,10 +100,11 @@ const normalize = results => {
 }
 
 /* 
-Normalize the score for every pages score by dividing it by the max value of the scores.
+Normalize the document location scores for every pages.
+Dividing it by the min value of the scores with the document location scores.
 */
 
-const normalizeSmallIsBetter = results => {
+const normalizeDocumentLocation = results => {
   let min = getMinValue(results)
 
   results.forEach(page => {
@@ -87,11 +112,44 @@ const normalizeSmallIsBetter = results => {
   })
 }
 
+/* 
+ Calculate the score for C-grade.
+ score = word_frequency + 0.8 * document_location
+ Updating the array with a totalScore
+*/
+
+const calculateWordFrequencyMultiplyDocLocation = results => {
+  results.forEach(score => {
+    score.totalScore = score.wsScore + score.docScore * 0.8
+    score.docScore = score.docScore * 0.8
+  })
+}
+
+/* 
+Keeping count of matching results.
+If word is found on page wsScore is added. If 0 no words was found.
+Updating the count of the array to the count.
+*/
+
+const getCountOfMatchingResults = results => {
+  let count = 0
+
+  results.map(page => {
+    if (page.wsScore != 0) {
+      count++
+    }
+  })
+
+  results.count = count
+}
+
 module.exports = {
-  getWordFrequencyScore,
+  createObjectsOfEveryPage,
   wordToID,
-  getDocumentLocation,
-  normalize,
+  normalizeWordFrequencyScore,
   getMaxValue,
-  normalizeSmallIsBetter
+  normalizeDocumentLocation,
+  calculateWordFrequencyMultiplyDocLocation,
+  getWordFrequencyScore,
+  getCountOfMatchingResults
 }

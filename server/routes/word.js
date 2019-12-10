@@ -8,9 +8,8 @@ module.exports = server => {
       let searchResult = await getResultsForSearchedWord(searchedWord)
 
       res.json(200, {
-        wordID: searchResult.wordId,
-        numberOfPages: searchResult.numberOfResults,
-        pagesThatIncludeWord: searchResult.pagesThatIncludeWord
+        totalScores: searchResult.totalScores,
+        countMatchingResults: searchResult.matchingCountResults
       })
       next()
     } catch (err) {

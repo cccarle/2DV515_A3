@@ -8,6 +8,7 @@ export const fetchSearchResultForWord = async word => {
   return await axios
     .post(`${variabels.url}/word`, params)
     .then(response => {
+      console.log(response.data)
       return response.data
     })
     .catch(error => {

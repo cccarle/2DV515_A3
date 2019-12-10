@@ -1,58 +1,49 @@
 const { getAllWordsIDsInPages } = require('../helpers/readData')
 const {
-  getWordFrequencyScore,
-  getDocumentLocation,
+  createObjectsOfEveryPage,
   wordToID,
-  normalize,
-  normalizeSmallIsBetter
+  normalizeWordFrequencyScore,
+  normalizeDocumentLocation,
+  calculateWordFrequencyMultiplyDocLocation,
+  getCountOfMatchingResults
 } = require('../helpers/helpers')
 
 /* 
-Returns pages that include the search word, with score and wordID.
-Returns in an ascending order and onlu top 5
+Returns pages that include the search word, with
+- url,
+- Document Location Score,
+- Word Frequency Score
+- Score = TotalScore, C-grade ranking
+- Count = Total Pages matching the word
+- Returns in an ascending order and only top 5
 */
 
 const getResultsForSearchedWord = async words => {
-  const results = []
   const allPages = await getAllWordsIDsInPages() // get all pages with IDs instead of words
   const wordQuerys = words.split(' ').map(word => wordToID(word)) // convert search words to IDs
+  const results = createObjectsOfEveryPage(allPages, wordQuerys) // array of page objects
 
-  allPages.map(page =>
-    results.push({
-      url: page.url,
-      totalScore: 0,
-      wsScore: getWordFrequencyScore(wordQuerys, page),
-      docScore: getDocumentLocation(wordQuerys, page)
+  normalizeWordFrequencyScore(results)
+  normalizeDocumentLocation(results)
+  calculateWordFrequencyMultiplyDocLocation(results)
+  getCountOfMatchingResults(results)
+
+  let matchingCountResults = results.count
+  let totalScores = results
+    .map(page => {
+      return {
+        url: page.url,
+        doc: page.docScore.toFixed(2),
+        score: page.totalScore.toFixed(2),
+        wsScore: page.wsScore.toFixed(2)
+      }
     })
-  )
+    .sort((a, b) => parseFloat(b.score) - parseFloat(a.score)) // sort by highest score
+    .slice(0, 5)
 
-  normalize(results)
-  normalizeSmallIsBetter(results)
-
-  results.forEach(score => {
-    score.totalScore = score.wsScore + score.docScore * 0.8
-    score.docScore = score.docScore * 0.8
-  })
-
-  console.log(
-    results
-      .sort((a, b) => parseFloat(b.totalScore) - parseFloat(a.totalScore))
-      .slice(0, 5)
-  )
-
-  // let numberOfResults = await getAllPagesThatIncludeWord(words, allPages).length
-
-  // let pagesThatIncludeWord = getAllPagesThatIncludeWord(words, allPages)
-
-  // let getDocumentLocationScore = getDocumentLocation(words, allPages)
-
-  // let arr = pagesThatIncludeWord.concat(getDocumentLocationScore)
-
-  return { pagesThatIncludeWord, numberOfResults }
+  return { totalScores, matchingCountResults }
 }
 
 module.exports = {
   getResultsForSearchedWord
 }
-
-// 0.77
