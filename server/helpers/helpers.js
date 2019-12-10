@@ -41,17 +41,14 @@ const getAllPagesThatIncludeWord = (words, allPages) => {
 
   normalize(pagesWithTheWord, getMaxValue(pagesWithTheWord))
 
-  return pagesWithTheWord
-    .map(page => {
-      return { url: page.url, score: page.normalizedScore }
-    })
-    .filter(
-      (value, index, self) => self.map(x => x.url).indexOf(value.url) == index
-    )
+  return pagesWithTheWord.filter(
+    (value, index, self) => self.map(x => x.url).indexOf(value.url) == index
+  )
 }
 
 const getDocumentLocation = (words, allPages) => {
   let wordArray = words.split(' ')
+  let pagesWithTheWord = []
 
   allPages.forEach(page => {
     var isFound = false
@@ -65,11 +62,11 @@ const getDocumentLocation = (words, allPages) => {
         if (wordId == value) {
           score += i + 1
           page.doc = score
+          pagesWithTheWord.push(page)
+
           isFound = true
           break
-        }
-
-        if (!isFound) {
+        } else {
           page.doc = 10000
         }
       }
@@ -78,16 +75,8 @@ const getDocumentLocation = (words, allPages) => {
 
   normalizeSmallIsBetter(allPages, getMinValue(allPages))
 
-  console.log(
-    allPages
-      .map(page => {
-        return { url: page.url, doc: page.doc }
-      })
-      .filter(
-        (value, index, self) => self.map(x => x.url).indexOf(value.url) == index
-      )
-      .sort((a, b) => parseFloat(b.doc) - parseFloat(a.doc))
-      .slice(0, 5)
+  return allPages.filter(
+    (value, index, self) => self.map(x => x.url).indexOf(value.url) == index
   )
 }
 
@@ -96,7 +85,7 @@ Returns the max value of the scores.
 */
 
 const getMaxValue = pagesWithTheWord => {
-  return Math.max(...pagesWithTheWord.map(page => page.score), 00001)
+  return Math.max(...pagesWithTheWord.map(page => page.score))
 }
 
 /* 
@@ -104,7 +93,7 @@ Returns the min value of the scores.
 */
 
 const getMinValue = pagesWithTheWord => {
-  return Math.min(...pagesWithTheWord.map(page => page.doc), 00001)
+  return Math.min(...pagesWithTheWord.map(page => page.doc))
 }
 
 /* 
@@ -112,9 +101,7 @@ Normalize the score for every pages score by dividing it by the max value of the
 */
 
 const normalize = (pagesWithTheWord, max) => {
-  pagesWithTheWord.map(
-    page => (page.normalizedScore = (page.score / max).toFixed(2))
-  )
+  pagesWithTheWord.map(page => (page.normalizedScore = page.score / max))
 }
 
 /* 
@@ -123,11 +110,6 @@ Normalize the score for every pages score by dividing it by the max value of the
 
 const normalizeSmallIsBetter = (pagesWithTheWord, min) => {
   pagesWithTheWord.map(page => (page.doc = min / page.doc))
-}
-
-const roundUp = (num, precision) => {
-  precision = Math.pow(10, precision)
-  return Math.ceil(num * precision) / precision
 }
 
 module.exports = {

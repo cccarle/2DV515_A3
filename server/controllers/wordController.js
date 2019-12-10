@@ -1,7 +1,8 @@
 const { getAllWordsIDsInPages } = require('../helpers/readData')
 const {
   getAllPagesThatIncludeWord,
-  getDocumentLocation
+  getDocumentLocation,
+  wordToID
 } = require('../helpers/helpers')
 
 /* 
@@ -10,15 +11,28 @@ Returns in an ascending order and onlu top 5
 */
 
 const getResultsForSearchedWord = async words => {
-  const allPages = await getAllWordsIDsInPages()
+  const results = []
+  const allPages = await getAllWordsIDsInPages() // get all pages with IDs instead of words
+  const wordQuerys = words.split(' ').map(word => wordToID(word)) // convert search words to IDs
 
-  let numberOfResults = await getAllPagesThatIncludeWord(words, allPages).length
+  allPages.map(page =>
+    results.push({
+      url: page.url,
+      totalScore: 0,
+      wsNormalized: 0,
+      docNormalized: 0
+    })
+  )
 
-  let pagesThatIncludeWord = await getAllPagesThatIncludeWord(words, allPages)
-    .sort((a, b) => parseFloat(b.score) - parseFloat(a.score))
-    .slice(0, 5)
+  console.log(results)
 
-  let a = getDocumentLocation(words, allPages)
+  // let numberOfResults = await getAllPagesThatIncludeWord(words, allPages).length
+
+  // let pagesThatIncludeWord = getAllPagesThatIncludeWord(words, allPages)
+
+  // let getDocumentLocationScore = getDocumentLocation(words, allPages)
+
+  // let arr = pagesThatIncludeWord.concat(getDocumentLocationScore)
 
   return { pagesThatIncludeWord, numberOfResults }
 }
@@ -26,3 +40,5 @@ const getResultsForSearchedWord = async words => {
 module.exports = {
   getResultsForSearchedWord
 }
+
+// 0.77
