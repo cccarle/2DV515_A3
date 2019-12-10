@@ -19,101 +19,79 @@ Returns all pages URL that contains the searched word.
 And returns how many times the word occurs in the page
 */
 
-const getAllPagesThatIncludeWord = (words, allPages) => {
-  let pagesWithTheWord = []
-  let wordArray = words.split(' ')
+const getWordFrequencyScore = (words, page) => {
+  let wsScore = 0
 
-  allPages.forEach(page => {
-    var score = 0
-
-    wordArray.forEach(word => {
-      let wordId = wordToID(word) // get wordID
-
-      page.words.forEach(wordInPage => {
-        if (wordId === wordInPage) {
-          score += 1
-          page.score = score
-          pagesWithTheWord.push(page)
-        }
-      })
-    })
-  })
-
-  normalize(pagesWithTheWord, getMaxValue(pagesWithTheWord))
-
-  return pagesWithTheWord.filter(
-    (value, index, self) => self.map(x => x.url).indexOf(value.url) == index
-  )
-}
-
-const getDocumentLocation = (words, allPages) => {
-  let wordArray = words.split(' ')
-  let pagesWithTheWord = []
-
-  allPages.forEach(page => {
-    var isFound = false
-
-    wordArray.forEach(word => {
-      var score = 0
-
-      let wordId = wordToID(word) // get wordID
-
-      for (let [i, value] of page.words.entries()) {
-        if (wordId == value) {
-          score += i + 1
-          page.doc = score
-          pagesWithTheWord.push(page)
-
-          isFound = true
-          break
-        } else {
-          page.doc = 10000
-        }
+  words.forEach(word => {
+    page.words.forEach(pageWord => {
+      if (word === pageWord) {
+        wsScore += 1
       }
     })
   })
 
-  normalizeSmallIsBetter(allPages, getMinValue(allPages))
+  return wsScore
+}
 
-  return allPages.filter(
-    (value, index, self) => self.map(x => x.url).indexOf(value.url) == index
-  )
+const getDocumentLocation = (words, page) => {
+  let docScore = 0
+  words.forEach(word => {
+    let wordIndex = page.words.indexOf(word)
+    if (wordIndex !== -1) {
+      docScore += wordIndex + 1
+    } else {
+      docScore += 100000
+    }
+    console.log(docScore)
+  })
+  return docScore
 }
 
 /* 
 Returns the max value of the scores.
 */
 
-const getMaxValue = pagesWithTheWord => {
-  return Math.max(...pagesWithTheWord.map(page => page.score))
+const getMaxValue = results => {
+  return Math.max(...results.map(page => page.wsScore), 0.00001)
 }
 
 /* 
 Returns the min value of the scores.
 */
 
-const getMinValue = pagesWithTheWord => {
-  return Math.min(...pagesWithTheWord.map(page => page.doc))
+const getMinValue = results => {
+  return Math.min(...results.map(page => page.docScore))
 }
 
 /* 
 Normalize the score for every pages score by dividing it by the max value of the scores.
 */
 
-const normalize = (pagesWithTheWord, max) => {
-  pagesWithTheWord.map(page => (page.normalizedScore = page.score / max))
+const normalize = results => {
+  let max = getMaxValue(results)
+
+  results.forEach(page => {
+    page.wsScore = page.wsScore / max
+  })
 }
 
 /* 
 Normalize the score for every pages score by dividing it by the max value of the scores.
 */
 
-const normalizeSmallIsBetter = (pagesWithTheWord, min) => {
-  pagesWithTheWord.map(page => (page.doc = min / page.doc))
+const normalizeSmallIsBetter = results => {
+  let min = getMinValue(results)
+
+  results.forEach(page => {
+    page.docScore = min / page.docScore
+  })
 }
 
 module.exports = {
-  getAllPagesThatIncludeWord,
+  getWordFrequencyScore,
   wordToID,
-  getDocumentLocation
+  getDocumentLocation,
+  normalize,
+  getMaxValue,
+  normalizeSmallIsBetter
 }

@@ -1,8 +1,10 @@
 const { getAllWordsIDsInPages } = require('../helpers/readData')
 const {
-  getAllPagesThatIncludeWord,
+  getWordFrequencyScore,
   getDocumentLocation,
-  wordToID
+  wordToID,
+  normalize,
+  normalizeSmallIsBetter
 } = require('../helpers/helpers')
 
 /* 
@@ -19,12 +21,24 @@ const getResultsForSearchedWord = async words => {
     results.push({
       url: page.url,
       totalScore: 0,
-      wsNormalized: 0,
-      docNormalized: 0
+      wsScore: getWordFrequencyScore(wordQuerys, page),
+      docScore: getDocumentLocation(wordQuerys, page)
     })
   )
 
-  console.log(results)
+  normalize(results)
+  normalizeSmallIsBetter(results)
+
+  results.forEach(score => {
+    score.totalScore = score.wsScore + score.docScore * 0.8
+    score.docScore = score.docScore * 0.8
+  })
+
+  console.log(
+    results
+      .sort((a, b) => parseFloat(b.totalScore) - parseFloat(a.totalScore))
+      .slice(0, 5)
+  )
 
   // let numberOfResults = await getAllPagesThatIncludeWord(words, allPages).length
 
